@@ -1,0 +1,26 @@
+{
+    "name": "kregel/radio",
+    "description": "",
+    "authors": [
+        {
+            "name": "Austin Kregel",
+            "email": "austinkregel@gmail.com"
+        }
+    ],
+    "repositories": [
+        {
+            "url":"git@github.com:saycomputer/jwt-auth.git",
+            "type":"vcs"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9",
+        "illuminate/support": "5.1.*|5.2*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Kregel\\Radio\\": "src/Radio"
+        }
+    },
+    "minimum-stability": "dev"
+}
