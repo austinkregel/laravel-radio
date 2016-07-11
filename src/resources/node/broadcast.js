@@ -9,17 +9,39 @@ console.log("setting up redis...");
 var redis = new Redis(),
     user = null;
 var has_joined = false;
-
+var channels = [];
 io.sockets.on('connection', function (socket) {
+
     socket.on('register-channels', function (data) {
         console.log("Registering user channels...")
-        console.log(user = data);
-        for (var i = 0; i < data.length; i++) {
-            redis.subscribe(data[i].uuid);
-            socket.join(data[i].uuid);
-            console.log("Registered to: " + data[i].uuid)
-            to(socket, data[i].uuid, 'Welcome to the channel!');
+        user = data.user;
+        var channels = user.channels,
+            chans = {};
+
+        // if (!channels.contains(user.channel)&& channels.length > 0) {
+        //     channels.concat(user.channel);
+        // }
+        if(!channels.contains(user.channel))
+            channels.push(user.channel);
+        else console.log("NOPE!")
+        console.log('');
+        console.log("User " + JSON.stringify(user));
+        console.log('');
+        console.log('');
+        console.log('Channels: ' + JSON.stringify(channels));
+        console.log('');
+        // channels[user.id] = [];
+        chans[user.id] = []
+        for (var i = 0; i < channels.length; i++) {
+            console.log("channel length: " + JSON.stringify(channels) + " -- " + i)
+            redis.subscribe(channels[i].uuid);
+            socket.join(channels[i].uuid);
+            console.log("Registered " + user.name + channels[i].uuid)
+            // to(socket, channels[i].uuid, {description:'Welcome back '+user.name , type: 'general'});
+            chans[user.id].push(channels[i].uuid);
         }
+        console.log(JSON.stringify(chans));
+
     });
     socket.on('get-response', function(data){
         to(socket, user[0].uuid, data);
@@ -28,7 +50,7 @@ io.sockets.on('connection', function (socket) {
         var notify = (data) ;
         request({
             method: 'PUT',
-            url: process.env.APP_URL+'/api/notification/' + notify.notification_id + '/read',
+            url: process.env.APP_URL+'/radio/api/notification/' + notify.notification_id + '/read',
             auth: {
                 'bearer': notify.token
             },
@@ -47,7 +69,8 @@ io.sockets.on('connection', function (socket) {
                     console.log("Failed to read notification. " + error.error)
                     return;
                 }
-                to(socket, notify.uuid, "Read notification");
+                console.log("Read notification");
+                // to(socket, notify.uuid, "Read notification");
             }else {
                 console.log(err, httpResponse); // Show the HTML for the Google homepage.
                 var fs = require('fs');
@@ -91,9 +114,23 @@ io.sockets.on('connection', function (socket) {
 });
 
 function to(socket, channel, data) {
+    if(typeof data === "object")
+    {
+        data = JSON.stringify(data);
+    }
     console.log("Emiting --" + data + "-- to " + channel);
     io.sockets.in(channel).emit('notify', data);
 }
 console.log("Server starting...")
-server.listen(42890);
+server.listen(process.env.NODE_PORT);
 console.log("Server started...")
+Array.prototype.contains = Array.prototype.contains || function(obj) {
+        var x;
+        for (x in obj) {
+            if (obj.hasOwnProperty(x) && obj[x] === obj) {
+                return true;
+            }
+        }
+
+        return false;
+    };
