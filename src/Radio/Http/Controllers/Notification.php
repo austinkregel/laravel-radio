@@ -1,15 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: sodium-chloride
- * Date: 5/24/2016
- * Time: 9:28 AM
- */
 
 namespace Kregel\Radio\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Tymon\JWTAuth\JWTAuth;
+use JWTAuth;
 use Kregel\Radio\Models\Notification as Notify;
 
 class Notification extends Controller
@@ -45,9 +39,7 @@ class Notification extends Controller
      */
     public function update($id, Request $request)
     {
-        $token = $request->get('token');
-
-        $user = JWTAuth::parseToken('bearer', 'authorization', $token)->authenticate();
+        $user = JWTAuth::parseToken()->authenticate();
 
         if(empty($user))
         {
