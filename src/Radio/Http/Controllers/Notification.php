@@ -54,11 +54,11 @@ class Notification extends Controller
                 'code' => 404
             ], 404);
         }
-        $notification->is_unread = 1;
+        $notification->is_unread = 0;
         $notification->save();
 
         return response()->json([
-            'message' => 'Notification made!',
+            'message' => 'Notification read!',
             'code' => $request->ajax() ? 202 : 200
         ]);
 
