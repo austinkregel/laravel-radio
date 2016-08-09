@@ -27,7 +27,6 @@ class Notification extends Model
                 'is_unread' => 1
             ]);
             Redis::publish($notify->channel->uuid, collect($data));
-
         });
 
     }
