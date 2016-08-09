@@ -12,7 +12,7 @@ use Kregel\Radio\Models\Channel;
 
 class Broadcast extends Command implements SelfHandling
 {
-    protected $signature = 'radio:broadcast {--message=: The message you want to send}';
+    protected $signature = 'radio:broadcast';
 
     /**
      * Execute the console command.
@@ -23,34 +23,25 @@ class Broadcast extends Command implements SelfHandling
     {
         $this->info('Firing up');
         $global = Channel::where('type', 'global')->first();
-        //foreach($global->users as $user)
-        $user = User::find(1);
-        $notification = Notification::create([
-            'channel_id' => $global->id,
-            'user_id' => $user->id,
-            'is_unread' => true,
-            'name' => 'Site update',
-            'description' => 'The site is going through an important update',
-            'type' => 'general'
-        ]);
+
+        $title = $this->ask('What is the title of this broadcast?');
+        $message = $this->ask('What is your message to your users?');
+
+        if(empty($message) || empty($title)) {
+            $this->error('You must fillout both the title and the message.');
+            return;
+        }
+        $this->info('Making your notification, please know if you have a lot of users this may take a while...');
+        foreach($global->users as $user)
+            Notification::create([
+                'channel_id' => $global->id,
+                'user_id' => $user->id,
+                'is_unread' => true,
+                'name' => $title,
+                'description' => $message,
+                'type' => 'general'
+            ]);
         $this->info('Completed!');
-    }
-
-    private function getUsers()
-    {
-        $user = config('auth.providers.users.model');
-        return $user::all();
-    }
-
-    private function createChannelFor($user)
-    {
-        $channel = new Channel;
-        $channel->type = 'personal';
-        $channel->uuid = Channel::uuid(openssl_random_pseudo_bytes(16));
-        $channel->save();
-
-        $user->channel_id = $channel->id;
-        $user->save();
     }
 
 }
