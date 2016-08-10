@@ -34,7 +34,7 @@ class Broadcast extends Command implements SelfHandling
         $this->info('Making your notification, please know if you have a lot of users this may take a while...');
         foreach($global->users as $user)
             Notification::create([
-                'channel_id' => $global->id,
+                'channel_id' => $user->channel->id,
                 'user_id' => $user->id,
                 'is_unread' => true,
                 'name' => $title,
