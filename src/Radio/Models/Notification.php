@@ -12,21 +12,18 @@ class Notification extends Model
 
     protected $table = 'radio_notifications';
 
-    protected $form_name = 'name';
-
-
     protected $fillable = [
         'channel_id', 'user_id', 'is_unread', 'name', 'description' , 'link', 'type'
     ];
 
     public static function boot()
     {
-        Notification::created(function (Notification $notify){
-            $data = array_merge($notify->toArray(), [
+        Notification::creating(function (Notification $notify){
+            $data = collect($notify->toArray())->merge([
                 'uuid' => $notify->user->channel->uuid,
                 'is_unread' => 1
             ]);
-            Redis::publish($notify->channel->uuid, collect($data));
+            Redis::publish($data['uuid'], collect($data));
         });
 
     }
@@ -34,10 +31,6 @@ class Notification extends Model
     protected $casts = [
         'is_unread' => 'bool'
     ];
-    public function channel()
-    {
-        return $this->belongsTo(Channel::class);
-    }
 
     public function user()
     {

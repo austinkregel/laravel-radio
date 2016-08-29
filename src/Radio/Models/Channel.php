@@ -11,7 +11,7 @@ class Channel extends Model
 
     protected $table = 'radio_channels';
 
-    protected $form_name = 'uuid';
+    protected $form_name = 'type';
 
     protected $fillable = [
         'uuid', 'type'
