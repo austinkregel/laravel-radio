@@ -18,7 +18,7 @@ class Notification extends Model
 
     public static function boot()
     {
-        Notification::creating(function (Notification $notify){
+        Notification::created(function (Notification $notify){
             $data = collect($notify->toArray())->merge([
                 'uuid' => $notify->user->channel->uuid,
                 'is_unread' => 1
